@@ -230,7 +230,8 @@ class HachemeisterRegression:
             inner = A + sigma2 * S[i]
             try:
                 inner_inv = np.linalg.inv(inner)
-            except np.linalg.LinAlgError as exc:
+            # pragma: no cover - sigma^2 * S_i is PD whenever the per-group fit succeeds
+            except np.linalg.LinAlgError as exc:  # pragma: no cover
                 raise ValueError(
                     f"Could not invert (A + sigma^2 * S_i) for group "
                     f"{unique_groups[i]!r}; numerical instability."

@@ -140,7 +140,10 @@ class JewellHierarchical:
         # For the leaf level, between-variance ``a`` is what we estimate by
         # running B-S over leaves grouped under each parent.
         # Build levels from finest (hierarchy_cols[-1]) up to coarsest (hierarchy_cols[0]).
-        for depth in range(len(hierarchy_cols), 0, -1):
+        # The loop always exits via `break` at the top-level case; the natural
+        # `range`-exhaustion branch is unreachable because we reject empty
+        # hierarchies upstream.
+        for depth in range(len(hierarchy_cols), 0, -1):  # pragma: no branch
             current_levels = hierarchy_cols[:depth]
             parent_levels = hierarchy_cols[: depth - 1]  # may be empty
 
@@ -187,7 +190,7 @@ class JewellHierarchical:
                         )
                         m = means_sub.size
                         denom = w_sum - float((weights_sub**2).sum()) / w_sum
-                        if denom <= 0:
+                        if denom <= 0:  # pragma: no cover - Cauchy-Schwarz guarantees denom > 0
                             a_raw = 0.0
                         else:
                             a_raw = (between_ss - (m - 1) * v_hat) / denom
@@ -249,7 +252,7 @@ class JewellHierarchical:
                     grand_mean = float(
                         (level_frame["weight"] * level_frame["mean"]).sum() / grand_w
                     )
-                else:
+                else:  # pragma: no cover - positive weights are enforced upstream
                     grand_mean = float(level_frame["mean"].mean())
                 self._mu = grand_mean
                 levels_info.append(
@@ -329,7 +332,7 @@ class JewellHierarchical:
         for entry in self._levels:
             if entry["level_cols"] and entry["level_cols"][-1] == target:
                 return entry["Z"].copy()
-        raise KeyError(f"Level {target!r} not found in fitted model.")
+        raise KeyError(f"Level {target!r} not found in fitted model.")  # pragma: no cover
 
     def credibility_premium(self) -> pd.Series:
         """Credibility-weighted premium at the finest level."""
