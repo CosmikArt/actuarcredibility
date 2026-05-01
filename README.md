@@ -82,12 +82,70 @@ print(model.credibility_premium())
 
 | Module | Description |
 |---|---|
-| `buhlmann` | Buhlmann and Buhlmann-Straub non-parametric credibility models |
-| `hierarchical` | Jewell multi-level hierarchical credibility for nested portfolios |
-| `regression` | Hachemeister regression credibility with covariate adjustment |
-| `classical` | Limited-fluctuation credibility — full and partial credibility standards |
-| `bayesian` | PyMC bridge for MCMC-based credibility estimation (optional dependency) |
-| `diagnostics` | Credibility convergence analysis, variance decomposition, model comparison |
+| `buhlmann` | `BuhlmannModel`, `BuhlmannStraubModel` — non-parametric credibility with Bühlmann-Gisler unbiased structural estimators |
+| `hierarchical` | `JewellHierarchical` — multi-level hierarchical credibility for nested portfolios (region → territory → risk_class, etc.) |
+| `regression` | `HachemeisterRegression` — regression credibility with covariates or time trend, weighted least squares per group |
+| `classical` | `LimitedFluctuationCredibility` — square-root rule for partial credibility, configurable tolerance and probability |
+| `bayesian` | `BayesianCredibility` — PyMC hierarchical normal model with posterior credibility factors (optional dependency) |
+| `diagnostics` | `variance_decomposition`, `credibility_curve`, `shrinkage_summary`, `compare_models` |
+
+## More examples
+
+### Classical limited fluctuation
+
+```python
+from actuarcredibility import LimitedFluctuationCredibility
+
+cred = LimitedFluctuationCredibility(k=0.05, p=0.90)
+cred.full_credibility_standard()           # 1082 claims
+cred.credibility_factor(n_claims=500)      # ~0.6797
+cred.credibility_premium(observed=0.72, prior=0.65, n_claims=500)
+```
+
+### Hachemeister trend credibility
+
+```python
+from actuarcredibility import HachemeisterRegression
+
+model = HachemeisterRegression().fit(
+    data,
+    group_col="state",
+    observation_col="avg_claim_cost",
+    time_col="year",
+    weight_col="claim_count",
+)
+model.coefficients()              # credibility-weighted (intercept, slope) per state
+model.predict("CA", year=2026)    # forecast next-year average cost
+```
+
+### Hierarchical (Jewell)
+
+```python
+from actuarcredibility import JewellHierarchical
+
+model = JewellHierarchical().fit(
+    data,
+    hierarchy_cols=["region", "territory", "risk_class"],
+    observation_col="loss_ratio",
+    weight_col="earned_premium",
+)
+model.credibility_factor(level="territory")
+model.credibility_premium()       # finest-level credibility premium
+```
+
+### Diagnostics
+
+```python
+from actuarcredibility import BuhlmannStraubModel
+from actuarcredibility.diagnostics import (
+    variance_decomposition, credibility_curve, shrinkage_summary,
+)
+
+model = BuhlmannStraubModel().fit(data, "risk", "loss_ratio", "earned_premium")
+variance_decomposition(model)     # v, a, between-share, k = v/a
+credibility_curve(model)          # Z(w) tabulated for plotting
+shrinkage_summary(model)          # raw vs. credibility distance to grand mean
+```
 
 ---
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "actuarcredibility"
-version = "0.0.1"
+version = "0.1.0"
 description = "Credibility models for actuarial pricing — Bühlmann, Bühlmann-Straub, Jewell, Hachemeister, and Bayesian extensions."
 readme = "README.md"
 license = "MIT"
@@ -63,6 +63,12 @@ line-length = 99
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+# Allow uppercase mathematical variable names (X, Y, Z, A, S, ...).
+ignore = ["N803", "N806"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]

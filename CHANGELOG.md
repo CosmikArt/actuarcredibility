@@ -2,15 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0] - 2026-05-01
+
+### Added
+- Real implementations (no longer scaffolds) for every credibility model:
+  - `BuhlmannModel` — non-parametric Bühlmann credibility (equal weights).
+  - `BuhlmannStraubModel` — Bühlmann-Straub with exposure weights, using
+    Bühlmann-Gisler unbiased moment estimators of `v` and `a`.
+  - `JewellHierarchical` — multi-level hierarchical credibility with
+    arbitrary nesting depth, iterative bottom-up B-S estimation, and
+    top-down credibility-premium recombination.
+  - `HachemeisterRegression` — regression credibility with covariates or a
+    time trend, weighted least squares per group, and PSD projection of the
+    between-coefficient covariance estimate.
+  - `LimitedFluctuationCredibility` — full and partial credibility under the
+    classical square-root rule.
+  - `BayesianCredibility` — PyMC-based hierarchical normal model with
+    posterior credibility factors and premiums.
+- New `diagnostics` module: `variance_decomposition`, `credibility_curve`,
+  `shrinkage_summary`, `compare_models`.
+- `predict()` helpers on `BuhlmannStraubModel` and `HachemeisterRegression`.
+- `summary()` and `structural_parameters` accessors on the B-S model.
+- `py.typed` marker — the package now ships type information.
+- Comprehensive test suite (61 tests) covering numerical correctness,
+  textbook formulas, error handling, and edge cases.
+
+### Changed
+- Source split from a single `core.py` into per-model modules
+  (`classical`, `buhlmann`, `hierarchical`, `regression`, `bayesian`,
+  `diagnostics`).
+- Public API stays import-compatible from the package root.
+- Version bumped to `0.1.0`.
+
 ## [0.0.1] - 2026-04-26
 
 ### Added
-- Initial project scaffold.
-- `BuhlmannModel` — non-parametric Bühlmann credibility.
-- `BuhlmannStraubModel` — Bühlmann-Straub with exposure weights.
-- `JewellHierarchical` — multi-level hierarchical credibility.
-- `HachemeisterRegression` — regression-based credibility with covariates.
-- `LimitedFluctuationCredibility` — classical full/partial credibility standards.
-- `BayesianCredibility` — PyMC bridge for MCMC-based credibility estimation.
-- Project configuration with `pyproject.toml` (Hatchling build).
-- MIT license.
+- Initial project scaffold (interface only; no implementations).
