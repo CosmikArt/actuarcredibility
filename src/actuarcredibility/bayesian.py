@@ -123,7 +123,7 @@ class BayesianCredibility:
         # Sensible default priors.
         data_mean = float(np.average(obs, weights=weights))
         data_sd = float(np.sqrt(np.average((obs - data_mean) ** 2, weights=weights)))
-        if data_sd == 0:
+        if data_sd < 1e-12:
             data_sd = 1.0
         cfg = {
             "mu_prior_mean": data_mean,
@@ -203,7 +203,7 @@ class BayesianCredibility:
         require_fitted(self._fitted, type(self).__name__)
         try:
             import arviz as az  # type: ignore[import-not-found]
-        except ImportError as exc:
+        except ImportError as exc:  # pragma: no cover - arviz ships with PyMC
             raise ImportError(
                 "posterior_summary requires arviz (installed automatically with PyMC)."
             ) from exc

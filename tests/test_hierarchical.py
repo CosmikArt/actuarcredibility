@@ -118,3 +118,104 @@ def test_jewell_empty_hierarchy_rejected():
             hierarchy_cols=[],
             observation_col="y",
         )
+
+
+def test_jewell_single_child_per_parent():
+    """A parent with only one child cannot estimate between-child variance,
+    triggering the Z=0 fallback."""
+    df = pd.DataFrame({
+        "region": ["N", "N", "S", "S"],
+        "risk":   ["A", "A", "B", "B"],
+        "y":      [0.6, 0.62, 0.8, 0.78],
+        "w":      [1.0, 1.0, 1.0, 1.0],
+    })
+    m = JewellHierarchical().fit(
+        df, hierarchy_cols=["region", "risk"],
+        observation_col="y", weight_col="w",
+    )
+    z_risk = m.credibility_factor("risk")
+    # Each region has only one child risk → Z = 0 for every leaf.
+    assert (z_risk == 0).all()
+
+
+def test_jewell_zero_between_variance_at_inner_level():
+    """When the between-leaf variance within a parent is zero (identical
+    leaf means), a is clipped to 0 and Z is 0 for those leaves."""
+    df = pd.DataFrame({
+        "region": ["N"] * 4 + ["S"] * 4,
+        "risk":   ["A", "A", "B", "B", "C", "C", "D", "D"],
+        "y":      [0.6, 0.62, 0.6, 0.62,   # both N risks have identical means
+                   0.7, 0.72, 0.7, 0.72],  # both S risks identical too
+        "w":      [1.0] * 8,
+    })
+    m = JewellHierarchical().fit(
+        df, hierarchy_cols=["region", "risk"],
+        observation_col="y", weight_col="w",
+    )
+    z_risk = m.credibility_factor("risk")
+    assert (z_risk == 0).all()
+
+
+def test_jewell_rejects_missing_hierarchy_column():
+    df = pd.DataFrame({"y": [0.5, 0.6], "w": [1.0, 1.0]})
+    m = JewellHierarchical()
+    with pytest.raises(KeyError):
+        m.fit(df, hierarchy_cols=["region"], observation_col="y", weight_col="w")
+
+
+def test_jewell_rejects_missing_weight_column():
+    df = pd.DataFrame({
+        "region": ["N", "S"], "y": [0.5, 0.6],
+    })
+    m = JewellHierarchical()
+    with pytest.raises(KeyError):
+        m.fit(
+            df, hierarchy_cols=["region"], observation_col="y", weight_col="missing",
+        )
+
+
+def test_jewell_credibility_factor_unfitted():
+    m = JewellHierarchical()
+    with pytest.raises(RuntimeError):
+        m.credibility_factor()
+
+
+def test_jewell_grand_mean_unfitted():
+    m = JewellHierarchical()
+    with pytest.raises(RuntimeError):
+        _ = m.grand_mean
+
+
+def test_jewell_three_level_hierarchy():
+    """Full three-level hierarchy: region → territory → risk."""
+    rng = np.random.default_rng(42)
+    rows = []
+    for region in ["N", "S"]:
+        for terr in ["T1", "T2"]:
+            for risk in ["R1", "R2"]:
+                for year in range(3):
+                    base = (
+                        0.6
+                        + (0.05 if region == "N" else -0.05)
+                        + (0.02 if terr == "T1" else -0.02)
+                        + (0.01 if risk == "R1" else -0.01)
+                    )
+                    rows.append({
+                        "region": region, "territory": terr, "risk": risk,
+                        "year": year,
+                        "y": base + rng.normal(0, 0.005),
+                        "w": 1.0,
+                    })
+    df = pd.DataFrame(rows)
+    m = JewellHierarchical().fit(
+        df,
+        hierarchy_cols=["region", "territory", "risk"],
+        observation_col="y", weight_col="w",
+    )
+    z_risk = m.credibility_factor("risk")
+    z_terr = m.credibility_factor("territory")
+    z_region = m.credibility_factor("region")
+    assert len(z_risk) == 8
+    assert len(z_terr) == 4
+    assert len(z_region) == 2
+    assert len(m.credibility_premium()) == 8

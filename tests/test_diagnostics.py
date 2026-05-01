@@ -90,3 +90,81 @@ def test_compare_models_skips_non_series_factors():
     # Smoke check that the LimitedFluctuationCredibility class can be instantiated
     # alongside (but is not panel-shaped).
     assert LimitedFluctuationCredibility() is not None
+
+
+def test_compare_models_empty_input():
+    """An empty model dict yields an empty DataFrame."""
+    out = compare_models({})
+    assert out.empty
+
+
+class _StubModel:
+    """Stub model returning non-Series outputs to exercise compare_models'
+    type-guard branches."""
+
+    def credibility_factor(self):
+        return pd.DataFrame({"Z": [0.1, 0.2]})
+
+    def credibility_premium(self):
+        return pd.DataFrame({"P_cred": [0.5, 0.7]})
+
+
+def test_compare_models_skips_non_series_premium():
+    out = compare_models({"stub": _StubModel()})
+    assert out.empty
+
+
+def test_compare_models_skips_dataframe_factor():
+    """A model whose credibility_factor() returns a DataFrame (Hachemeister)
+    is silently skipped in the factor section but its premium Series is kept."""
+    from actuarcredibility import HachemeisterRegression
+    rows = []
+    for g in range(3):
+        for t in range(5):
+            rows.append({"g": g, "t": float(t),
+                         "y": 0.5 + 0.05 * g + 0.02 * t, "w": 1.0})
+    df = pd.DataFrame(rows)
+    h = HachemeisterRegression().fit(
+        df, group_col="g", observation_col="y", time_col="t", weight_col="w",
+    )
+    out = compare_models({"hach": h})
+    assert "hach::P_cred" in out.columns
+    assert not any("hach::Z" in c for c in out.columns)
+
+
+def test_credibility_curve_with_zero_a():
+    """If a == 0, the curve is identically zero."""
+    df = pd.DataFrame({
+        "g": ["A", "A", "A", "A", "B", "B", "B", "B"],
+        "y": [0.5, 0.7, 0.6, 0.8, 0.5, 0.7, 0.6, 0.8],
+        "w": [1.0] * 8,
+    })
+    m = BuhlmannStraubModel().fit(df, group_col="g", observation_col="y", weight_col="w")
+    assert m.structural_parameters["a"] == 0.0
+    curve = credibility_curve(m, n_points=20)
+    assert (curve["Z"] == 0).all()
+
+
+def test_variance_decomposition_with_zero_total():
+    """When v == 0 and a == 0 (degenerate), between_share defaults to 0."""
+    df = pd.DataFrame({
+        "g": ["A", "A", "B", "B"],
+        "y": [0.5, 0.5, 0.5, 0.5],
+        "w": [1.0] * 4,
+    })
+    m = BuhlmannStraubModel().fit(df, group_col="g", observation_col="y", weight_col="w")
+    vd = variance_decomposition(m)
+    assert vd["between_share"] == 0.0
+
+
+def test_shrinkage_summary_with_a_zero():
+    """When a clips to 0, every group's credibility distance equals 0
+    (full shrinkage to the grand mean)."""
+    df = pd.DataFrame({
+        "g": ["A", "A", "A", "B", "B", "B"],
+        "y": [0.5, 0.6, 0.7, 0.5, 0.6, 0.7],
+        "w": [1.0] * 6,
+    })
+    m = BuhlmannStraubModel().fit(df, group_col="g", observation_col="y", weight_col="w")
+    s = shrinkage_summary(m)
+    assert (s["cred_distance"] < 1e-12).all()

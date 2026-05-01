@@ -168,3 +168,55 @@ def test_predict_unknown_group_raises(panel):
     )
     with pytest.raises(KeyError, match="not present"):
         m.predict("Z")
+
+
+def test_buhlmann_rejects_single_period_per_group():
+    """If every group has only one observation period, within-group variance
+    cannot be estimated and fit must raise."""
+    df = pd.DataFrame({"g": ["A", "B", "C"], "y": [0.5, 0.7, 0.9]})
+    m = BuhlmannModel()
+    with pytest.raises(ValueError, match="within-group variance"):
+        m.fit(df, group_col="g", observation_col="y")
+
+
+def test_buhlmann_straub_rejects_nan_observations(panel):
+    bad = panel.copy()
+    bad.loc[0, "y"] = float("nan")
+    m = BuhlmannStraubModel()
+    with pytest.raises(ValueError, match="non-finite"):
+        m.fit(bad, group_col="g", observation_col="y", weight_col="w")
+
+
+def test_buhlmann_summary_columns(panel):
+    m = BuhlmannStraubModel().fit(
+        panel, group_col="g", observation_col="y", weight_col="w"
+    )
+    summary = m.summary()
+    assert set(summary.columns) == {"weight", "mean", "Z", "P_cred"}
+    assert list(summary.index) == ["A", "B", "C"]
+
+
+def test_buhlmann_structural_parameters_unfitted():
+    m = BuhlmannStraubModel()
+    with pytest.raises(RuntimeError):
+        _ = m.structural_parameters
+
+
+def test_buhlmann_summary_unfitted():
+    m = BuhlmannStraubModel()
+    with pytest.raises(RuntimeError):
+        m.summary()
+
+
+def test_buhlmann_predict_unfitted():
+    m = BuhlmannStraubModel()
+    with pytest.raises(RuntimeError):
+        m.predict("A")
+
+
+def test_buhlmann_structural_parameters_keys(panel):
+    m = BuhlmannStraubModel().fit(
+        panel, group_col="g", observation_col="y", weight_col="w"
+    )
+    params = m.structural_parameters
+    assert set(params.keys()) == {"mu", "v", "a", "a_raw", "k"}

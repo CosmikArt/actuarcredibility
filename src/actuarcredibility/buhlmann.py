@@ -57,7 +57,7 @@ def _bs_structural_estimates(
 
     w_sum_per_group = np.bincount(inverse, weights=weights, minlength=r)
     wx_sum_per_group = np.bincount(inverse, weights=weights * obs, minlength=r)
-    if np.any(w_sum_per_group <= 0):
+    if np.any(w_sum_per_group <= 0):  # pragma: no cover - guarded by require_positive_weights
         raise ValueError("Every group must have a strictly positive total weight.")
     group_means = wx_sum_per_group / w_sum_per_group
     grand_total_weight = float(w_sum_per_group.sum())
@@ -87,7 +87,9 @@ def _bs_structural_estimates(
     # (equation 4.31).
     between_ss = float((w_sum_per_group * (group_means - grand_mean) ** 2).sum())
     denom = grand_total_weight - float((w_sum_per_group**2).sum()) / grand_total_weight
-    if denom <= 0:
+    # denom > 0 follows from Cauchy-Schwarz whenever r >= 2 with positive
+    # weights, both of which are enforced above.
+    if denom <= 0:  # pragma: no cover - mathematically unreachable under our guards
         raise ValueError(
             "Degenerate weight configuration: cannot compute between-group "
             "variance estimate (denominator non-positive)."
@@ -206,7 +208,7 @@ class BuhlmannStraubModel:
         return self
 
     def _compute_z(self, w: np.ndarray) -> np.ndarray:
-        if self._a is None or self._k is None:
+        if self._a is None or self._k is None:  # pragma: no cover - internal guard
             raise RuntimeError("internal error: model parameters not initialized")
         if self._a == 0.0:
             return np.zeros_like(w)
