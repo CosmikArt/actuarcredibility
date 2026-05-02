@@ -7,8 +7,6 @@
 
 Python library for actuarial credibility models. Covers Bühlmann, Bühlmann-Straub, Jewell hierarchical, Hachemeister regression, classical limited-fluctuation, and an optional Bayesian model via PyMC. Outputs integrate with pandas DataFrames. References Bühlmann & Gisler (2005) and Klugman ch. 20.
 
----
-
 ## Installation
 
 From PyPI:
@@ -17,7 +15,7 @@ From PyPI:
 pip install actuarcredibility
 ```
 
-**From source:**
+From source:
 
 ```bash
 git clone https://github.com/CosmikArt/actuarcredibility.git
@@ -25,17 +23,15 @@ cd actuarcredibility
 pip install -e .
 ```
 
-**With Bayesian extensions:**
+With Bayesian extensions:
 
 ```bash
 pip install actuarcredibility[bayesian]
 ```
 
----
-
 ## Quickstart
 
-Fit a Buhlmann-Straub model to multi-year loss experience by risk class:
+Buhlmann-Straub on multi-year loss data:
 
 ```python
 import pandas as pd
@@ -66,8 +62,6 @@ print(model.credibility_factor())
 print(model.credibility_premium())
 ```
 
----
-
 ## Features
 
 | Module | Description |
@@ -95,7 +89,15 @@ cred.credibility_premium(observed=0.72, prior=0.65, n_claims=500)
 ### Hachemeister trend credibility
 
 ```python
+import pandas as pd
 from actuarcredibility import HachemeisterRegression
+
+data = pd.DataFrame({
+    "state": ["CA", "CA", "CA", "TX", "TX", "TX"],
+    "year": [2021, 2022, 2023, 2021, 2022, 2023],
+    "avg_claim_cost": [4500, 4700, 4900, 5200, 5400, 5600],
+    "claim_count": [120, 130, 140, 80, 85, 95],
+})
 
 model = HachemeisterRegression().fit(
     data,
@@ -111,7 +113,18 @@ model.predict("CA", year=2026)    # forecast next-year average cost
 ### Hierarchical (Jewell)
 
 ```python
+import pandas as pd
 from actuarcredibility import JewellHierarchical
+
+data = pd.DataFrame({
+    "region": (["W"]*8 + ["E"]*8),
+    "territory": (["W1","W1","W2","W2"]*2 + ["E1","E1","E2","E2"]*2),
+    "risk_class": (["A","B"]*8),
+    "year": [2022, 2022, 2022, 2022, 2023, 2023, 2023, 2023] * 2,
+    "loss_ratio": [0.62, 0.71, 0.58, 0.69, 0.65, 0.74, 0.60, 0.71,
+                   0.81, 0.75, 0.66, 0.72, 0.83, 0.77, 0.68, 0.74],
+    "earned_premium": [2_000_000]*16,
+})
 
 model = JewellHierarchical().fit(
     data,
@@ -126,18 +139,26 @@ model.credibility_premium()       # finest-level credibility premium
 ### Diagnostics
 
 ```python
+import pandas as pd
 from actuarcredibility import BuhlmannStraubModel
 from actuarcredibility.diagnostics import (
     variance_decomposition, credibility_curve, shrinkage_summary,
 )
+
+data = pd.DataFrame({
+    "risk": ["A","A","A","B","B","B","C","C","C"],
+    "year": [2021,2022,2023]*3,
+    "loss_ratio": [0.62,0.58,0.65,0.81,0.77,0.84,0.45,0.52,0.48],
+    "earned_premium": [5_000_000,5_200_000,5_500_000,
+                       2_000_000,2_100_000,2_300_000,
+                       8_000_000,8_500_000,9_000_000],
+})
 
 model = BuhlmannStraubModel().fit(data, "risk", "loss_ratio", "earned_premium")
 variance_decomposition(model)     # v, a, between-share, k = v/a
 credibility_curve(model)          # Z(w) tabulated for plotting
 shrinkage_summary(model)          # raw vs. credibility distance to grand mean
 ```
-
----
 
 ## References
 
@@ -148,25 +169,12 @@ shrinkage_summary(model)          # raw vs. credibility distance to grand mean
 - Hachemeister, C.A. (1975). "Credibility for Regression Models with Application to Trend." In *Credibility: Theory and Applications*, P.M. Kahn (ed.), Academic Press.
 - Casualty Actuarial Society. Exam 5 Study Notes: Credibility.
 
----
-
 ## Contributing
 
-Contributions are welcome. Please open an issue before submitting a pull request so we can discuss scope and approach.
-
-```bash
-git clone https://github.com/CosmikArt/actuarcredibility.git
-cd actuarcredibility
-pip install -e ".[dev]"
-pytest
-```
-
----
+Run `pytest` before sending a PR.
 
 ## Author
 
-**Isaac López**
+Isaac López
 
----
-
-*MIT License. See [LICENSE](LICENSE) for details.*
+MIT License. See [LICENSE](LICENSE).
