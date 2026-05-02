@@ -1,13 +1,13 @@
-"""actuarcredibility — Credibility models for actuarial pricing.
+"""actuarcredibility: credibility models for actuarial pricing.
 
 Public API
 ----------
-- :class:`BuhlmannModel` — non-parametric Bühlmann credibility (equal weights).
-- :class:`BuhlmannStraubModel` — Bühlmann-Straub with exposure weights.
-- :class:`JewellHierarchical` — multi-level hierarchical credibility.
-- :class:`HachemeisterRegression` — regression credibility with covariates.
-- :class:`LimitedFluctuationCredibility` — classical full/partial standards.
-- :class:`BayesianCredibility` — PyMC bridge for MCMC-based credibility.
+- :class:`BuhlmannModel`: non-parametric Bühlmann credibility (equal weights).
+- :class:`BuhlmannStraubModel` (Bühlmann-Straub with exposure weights).
+- :class:`JewellHierarchical`. Multi-level hierarchical credibility.
+- :class:`HachemeisterRegression`: regression credibility with covariates.
+- :class:`LimitedFluctuationCredibility`. Classical full/partial standards.
+- :class:`BayesianCredibility` (PyMC bridge for MCMC-based credibility).
 
 Diagnostics live in :mod:`actuarcredibility.diagnostics`.
 """

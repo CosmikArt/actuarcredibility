@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "actuarcredibility"
 version = "0.1.0"
-description = "Credibility models for actuarial pricing — Bühlmann, Bühlmann-Straub, Jewell, Hachemeister, and Bayesian extensions."
+description = "Credibility models for actuarial pricing: Bühlmann, Bühlmann-Straub, Jewell, Hachemeister, and Bayesian extensions."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
@@ -22,7 +22,7 @@ keywords = [
     "ratemaking",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Financial and Insurance Industry",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",

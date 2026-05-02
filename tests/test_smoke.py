@@ -1,4 +1,4 @@
-"""Smoke tests — verify imports, version, and basic instantiation."""
+"""Smoke tests: verify imports, version, and basic instantiation."""
 
 import actuarcredibility
 from actuarcredibility import (

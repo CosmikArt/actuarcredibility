@@ -45,7 +45,7 @@ def _bs_structural_estimates(
 ]:
     """Bühlmann-Gisler unbiased moment estimators of v and a.
 
-    Implements equations 4.27–4.32 of Bühlmann & Gisler (2005).
+    Implements equations 4.27 to 4.32 of Bühlmann & Gisler (2005).
     """
     unique_groups, inverse = np.unique(groups, return_inverse=True)
     r = unique_groups.size
@@ -70,7 +70,7 @@ def _bs_structural_estimates(
     n_per_group = np.bincount(inverse, minlength=r)
 
     # v_hat: mean across groups of unbiased within-group variance estimates.
-    # For groups with n_i = 1 we cannot estimate within-group variance — drop.
+    # For groups with n_i = 1 we cannot estimate within-group variance, so drop.
     multi_obs_mask = n_per_group > 1
     if not np.any(multi_obs_mask):
         raise ValueError(
@@ -246,7 +246,7 @@ class BuhlmannStraubModel:
     def structural_parameters(self) -> dict[str, float]:
         """Estimated structural parameters: ``mu``, ``v``, ``a``, ``k = v/a``.
 
-        Also includes ``a_raw`` — the unbiased estimator before clipping at 0.
+        Also includes ``a_raw``, the unbiased estimator before clipping at 0.
         Negative ``a_raw`` indicates the data are consistent with a single
         underlying risk (no heterogeneity signal).
         """

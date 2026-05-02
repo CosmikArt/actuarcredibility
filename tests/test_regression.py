@@ -240,7 +240,7 @@ def test_hachemeister_unfitted_methods_raise():
 
 def test_hachemeister_zero_dof_rejected():
     """With p=2 design and exactly 2 observations per group, sum(n_i - p) = 0
-    and residual variance cannot be estimated — fit must raise."""
+    and residual variance cannot be estimated, so fit must raise."""
     df = pd.DataFrame({
         "g": [0, 0, 1, 1, 2, 2],
         "t": [0.0, 1.0, 0.0, 1.0, 0.0, 1.0],

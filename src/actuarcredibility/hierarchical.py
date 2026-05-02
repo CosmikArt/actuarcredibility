@@ -1,4 +1,4 @@
-"""Jewell hierarchical credibility — multi-level extension of Bühlmann-Straub.
+"""Jewell hierarchical credibility: multi-level extension of Bühlmann-Straub.
 
 Implements the iterative variance-decomposition approach of
 Jewell (1975) and Bühlmann-Gisler (2005, Chapter 6). For each level of

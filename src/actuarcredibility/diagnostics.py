@@ -2,14 +2,14 @@
 
 Includes:
 
-- :func:`variance_decomposition` — split total variance into within-risk
+- :func:`variance_decomposition`: splits total variance into within-risk
   (process) and between-risk (structural) components.
-- :func:`credibility_curve` — credibility factor as a function of weight,
-  given fitted ``v`` and ``a``.
-- :func:`compare_models` — side-by-side comparison of credibility-weighted
+- :func:`credibility_curve` returns the credibility factor as a function of
+  weight, given fitted ``v`` and ``a``.
+- :func:`compare_models`. Side-by-side comparison of credibility-weighted
   premiums and factors across fitted models.
-- :func:`shrinkage_summary` — distance from group mean to grand mean before
-  vs. after credibility weighting (a "how much did credibility move me?"
+- :func:`shrinkage_summary` (distance from group mean to grand mean before
+  vs. after credibility weighting; a "how much did credibility move me?"
   diagnostic).
 """
 

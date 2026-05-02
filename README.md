@@ -1,27 +1,17 @@
 [![PyPI version](https://img.shields.io/pypi/v/actuarcredibility?color=blue)](https://pypi.org/project/actuarcredibility/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Status: Alpha](https://img.shields.io/badge/status-alpha-orange.svg)]()
+[![Status: Beta](https://img.shields.io/badge/status-beta-yellow.svg)]()
 
 # actuarcredibility
 
-**Credibility models for actuarial pricing — from Buhlmann to Bayesian.**
-
----
-
-## What is actuarcredibility?
-
-Credibility theory is the backbone of actuarial pricing. Every P&C actuary learns it, most use it daily, and yet there is **zero dedicated Python implementation**. The state of the art remains Excel spreadsheets, SAS macros, and hand-rolled R scripts that never leave their author's laptop.
-
-`actuarcredibility` fills that gap. It provides production-grade implementations of every major credibility framework — classical limited-fluctuation standards, the Buhlmann family, Jewell's hierarchical extension, Hachemeister's regression credibility, and modern Bayesian approaches via optional PyMC integration. The API is consistent, the math is documented, and the outputs integrate cleanly with pandas workflows.
-
-If you price insurance, this library replaces your spreadsheet.
+Python library for actuarial credibility models. Covers Bühlmann, Bühlmann-Straub, Jewell hierarchical, Hachemeister regression, classical limited-fluctuation, and an optional Bayesian model via PyMC. Outputs integrate with pandas DataFrames. References Bühlmann & Gisler (2005) and Klugman ch. 20.
 
 ---
 
 ## Installation
 
-**From PyPI (once published):**
+From PyPI:
 
 ```bash
 pip install actuarcredibility
@@ -82,11 +72,11 @@ print(model.credibility_premium())
 
 | Module | Description |
 |---|---|
-| `buhlmann` | `BuhlmannModel`, `BuhlmannStraubModel` — non-parametric credibility with Bühlmann-Gisler unbiased structural estimators |
-| `hierarchical` | `JewellHierarchical` — multi-level hierarchical credibility for nested portfolios (region → territory → risk_class, etc.) |
-| `regression` | `HachemeisterRegression` — regression credibility with covariates or time trend, weighted least squares per group |
-| `classical` | `LimitedFluctuationCredibility` — square-root rule for partial credibility, configurable tolerance and probability |
-| `bayesian` | `BayesianCredibility` — PyMC hierarchical normal model with posterior credibility factors (optional dependency) |
+| `buhlmann` | `BuhlmannModel`, `BuhlmannStraubModel`. Non-parametric credibility with Bühlmann-Gisler unbiased structural estimators. |
+| `hierarchical` | `JewellHierarchical`: multi-level hierarchical credibility for nested portfolios (region → territory → risk_class, etc.). |
+| `regression` | `HachemeisterRegression` (regression credibility with covariates or a time trend; weighted least squares per group). |
+| `classical` | `LimitedFluctuationCredibility`. Square-root rule for partial credibility, configurable tolerance and probability. |
+| `bayesian` | `BayesianCredibility` is a PyMC hierarchical normal model with posterior credibility factors. Optional dependency. |
 | `diagnostics` | `variance_decomposition`, `credibility_curve`, `shrinkage_summary`, `compare_models` |
 
 ## More examples
@@ -156,7 +146,7 @@ shrinkage_summary(model)          # raw vs. credibility distance to grand mean
 - Klugman, S.A., Panjer, H.H. & Willmot, G.E. *Loss Models: From Data to Decisions*. Wiley.
 - Jewell, W.S. (1975). "The Use of Collateral Data in Credibility Theory: A Hierarchical Model." *Giornale dell'Istituto Italiano degli Attuari*, 38, 1-16.
 - Hachemeister, C.A. (1975). "Credibility for Regression Models with Application to Trend." In *Credibility: Theory and Applications*, P.M. Kahn (ed.), Academic Press.
-- Casualty Actuarial Society. Exam 5 Study Notes — Credibility.
+- Casualty Actuarial Society. Exam 5 Study Notes: Credibility.
 
 ---
 
