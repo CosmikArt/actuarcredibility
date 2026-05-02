@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "actuarcredibility"
-version = "0.1.0"
+version = "0.1.1"
 description = "Credibility models for actuarial pricing: Bühlmann, Bühlmann-Straub, Jewell, Hachemeister, and Bayesian extensions."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
 authors = [
-    { name = "Isaac López", email = "isaaclopg@gmail.com" },
+    { name = "Isaac López", email = "jisaaclopg@gmail.com" },
 ]
 keywords = [
     "actuarial",
